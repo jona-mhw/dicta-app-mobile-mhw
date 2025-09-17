@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const joinBtnInitial = document.getElementById('join-btn-initial');
     const joinSubmitBtn = document.getElementById('join-submit-btn');
     const copyBtn = document.getElementById('copy-btn');
+    const clearTextBtn = document.getElementById('clear-text-btn');
 
     // Entradas y Salidas
     const codeInput = document.getElementById('code-input');
@@ -70,6 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
+    clearTextBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres borrar todo el texto?')) {
+            textInput.value = '';
+            if (sessionCode) {
+                socket.emit('text_clear', { code: sessionCode });
+            }
+        }
+    });
+
     // --- Manejadores de eventos de Socket.IO ---
 
     socket.on('session_created', (data) => {
@@ -89,6 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('text_updated', (data) => {
         outputText.innerText = data.text;
+    });
+
+    socket.on('text_cleared', () => {
+        outputText.innerText = 'Esperando texto...';
     });
 
     socket.on('session_ended', (data) => {

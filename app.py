@@ -91,6 +91,17 @@ def handle_text_update(data):
         if client_sid:
             emit('text_updated', {'text': text}, room=client_sid)
 
+@socketio.on('text_clear')
+def handle_text_clear(data):
+    """Maneja la acción de borrar texto desde el host (celular)."""
+    code = data.get('code')
+    
+    if code in sessions and sessions[code]['host'] == request.sid:
+        # Emitir evento de borrado al cliente de la sala
+        client_sid = sessions[code]['client']
+        if client_sid:
+            emit('text_cleared', room=client_sid)
+
 if __name__ == '__main__':
     import os
     # Cloud Run usa PORT env var, local usa 5000

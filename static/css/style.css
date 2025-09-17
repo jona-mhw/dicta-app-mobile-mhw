@@ -67,6 +67,16 @@ p {
     background-color: #166fe5;
 }
 
+.btn-secondary {
+    background-color: #42a5f5;
+    color: white;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background-color: #1e88e5;
+}
+
 .btn:active {
     transform: translateY(1px);
 }
