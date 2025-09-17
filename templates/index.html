@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicta App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Vista Inicial: Selección de rol -->
+        <div id="initial-view">
+            <h1>Dicta App</h1>
+            <p>Convierte tu voz en texto en tu computadora, sin teclear.</p>
+            <div class="button-group">
+                <button id="start-btn" class="btn btn-primary">🎤 Iniciar Dictado (Celular)</button>
+                <button id="join-btn-initial" class="btn">💻 Recibir Texto (PC)</button>
+            </div>
+        </div>
+
+        <!-- Vista Host (Celular): Muestra código y área de texto -->
+        <div id="host-view" class="hidden">
+            <h2>Código de Sesión:</h2>
+            <div id="session-code-container">
+                <span id="session-code">------</span>
+            </div>
+            <p id="status">1. Abre la app en tu PC e ingresa este código.</p>
+            <textarea id="text-input" rows="10" placeholder="Usa el micrófono de tu teclado para dictar aquí..."></textarea>
+        </div>
+
+        <!-- Vista Cliente (Computadora): Ingresa código o muestra texto -->
+        <div id="client-view" class="hidden">
+            <!-- Formulario para unirse -->
+            <div id="join-form">
+                <h2>Recibir Texto</h2>
+                <p>Ingresa el código de 6 dígitos que aparece en tu celular.</p>
+                <input type="text" id="code-input" placeholder="######" maxlength="6" autocomplete="off">
+                <button id="join-submit-btn" class="btn btn-primary">Conectar</button>
+            </div>
+
+            <!-- Área de visualización de texto -->
+            <div id="display-area" class="hidden">
+                <h2>Texto Recibido</h2>
+                <div class="text-display-container">
+                    <pre id="output-text">Esperando texto...</pre>
+                </div>
+                <button id="copy-btn" class="btn">Copiar Texto</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
