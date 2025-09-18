@@ -85,19 +85,106 @@ gcloud run deploy dictapp --source . --region us-central1 --allow-unauthenticate
 
 ```
 dicta-app-mobile/
-├── app.py                 # Aplicación Flask principal
-├── requirements.txt       # Dependencias Python
-├── Dockerfile            # Configuración Docker
-├── README.md             # Este archivo
-├── DEPLOY.md             # Guía de despliegue
-├── deploy.sh             # Script de despliegue (Linux/Mac)
-├── deploy.ps1            # Script de despliegue (Windows)
-├── static/               # Archivos estáticos (CSS, JS)
+├── app.py                           # Aplicación Flask principal
+├── requirements.txt                 # Dependencias Python  
+├── Dockerfile                      # Configuración Docker
+├── README.md                       # Este archivo
+├── DEPLOY.md                       # Guía de despliegue
+├── deploy.sh                       # Script de despliegue (Linux/Mac)
+├── deploy.ps1                      # Script de despliegue (Windows)
+├── static/                         # Archivos estáticos (CSS, JS)
 │   ├── css/
 │   └── js/
-└── templates/            # Templates HTML
-    └── index.html
+├── templates/                      # Templates HTML
+│   └── index.html
+└── google-scripts-version/         # 🎁 BONUS: Versión Apps Script
+    ├── Code.gs                     # Backend Google Apps Script
+    ├── index.html                  # Frontend adaptado
+    ├── README.md                   # Guía específica
+    └── technical-analysis-slides.html  # Análisis técnico
 ```
+
+## 🎁 BONUS TRACK: Google Apps Script Version
+
+¿No tienes acceso a despliegue en la nube? ¡Tenemos una alternativa! 🚀
+
+Una versión completamente funcional usando **Google Apps Script + Google Sheets** como backend, perfecta para:
+- Entornos corporativos con restricciones
+- Usuarios sin acceso a servicios de nube
+- Alternativa 100% gratuita sin límites
+- No requiere instalación de servidores
+
+### ⚡ Características de la Versión Apps Script
+
+- 📊 **Google Sheets como DB** - Base de datos integrada
+- 🔄 **Control manual** - Botones "📤 Enviar" y "🔄 Actualizar"
+- 🔗 **Verificación de conexión** - Feedback claro del estado
+- 🆓 **100% gratuito** - Sin costos de hosting
+- 📱 **Mismo UI** - Interfaz familiar y responsiva
+
+### 🚀 Setup Rápido (5 minutos)
+
+1. **Crear Google Sheet:**
+   ```
+   1. Abre sheets.google.com
+   2. Crea nueva hoja
+   3. Copia el ID de la URL: https://docs.google.com/spreadsheets/d/[TU-ID-AQUÍ]/edit
+   ```
+
+2. **Configurar Apps Script:**
+   ```
+   1. Ve a script.google.com
+   2. Nuevo proyecto → Pegar código de google-scripts-version/Code.gs
+   3. Reemplazar "TU_GOOGLE_SHEET_ID_AQUI" con tu ID
+   4. Agregar archivo HTML → Pegar código de google-scripts-version/index.html
+   ```
+
+3. **Desplegar:**
+   ```
+   1. Hacer clic "Implementar" → "Nueva implementación"
+   2. Tipo: "Aplicación web"
+   3. Ejecutar como: "Yo"
+   4. Acceso: "Cualquier persona"
+   5. ¡Copiar URL y usar!
+   ```
+
+### 📊 Comparación: Cloud Run vs Apps Script
+
+| Característica | Cloud Run (Principal) | Apps Script (Bonus) |
+|---|---|---|
+| **Latencia** | <50ms (WebSockets) | 2-3s (Polling) |
+| **Tiempo real** | ✅ Verdadero | ⚠️ Simulado |
+| **Setup** | Requiere GCloud CLI | 🚀 5 minutos browser |
+| **Costo** | Gratis 2M requests/mes | ✅ 100% gratuito |
+| **Escalabilidad** | Auto-scaling | Hasta 6 min/ejecución |
+| **Facilidad** | Intermedio | 🟢 Súper fácil |
+
+### 📁 Archivos de la Versión Apps Script
+
+```
+google-scripts-version/
+├── Code.gs                           # Backend Google Apps Script
+├── index.html                        # Frontend adaptado (polling)
+├── README.md                         # Guía específica de setup
+└── technical-analysis-slides.html    # Análisis técnico detallado
+```
+
+### 🎯 Cuándo Usar Cada Versión
+
+**🚀 Usa Cloud Run si:**
+- Necesitas latencia ultra-baja (<50ms)
+- Tienes muchos usuarios simultáneos
+- Quieres la experiencia más fluida
+
+**📊 Usa Apps Script si:**
+- No puedes desplegar en GCloud
+- Prefieres configuración súper simple
+- Estás en entorno corporativo restrictivo
+- Latencia de 2-3s es aceptable
+
+> 💡 **Tip:** Ambas versiones comparten la misma UI y experiencia de usuario, solo cambia el backend!
+
+**Documentación completa:** [`google-scripts-version/README.md`](./google-scripts-version/README.md)
 
 ## 🔧 API y Eventos WebSocket
 
