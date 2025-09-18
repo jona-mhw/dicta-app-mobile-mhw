@@ -1,0 +1,702 @@
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dicta App - Google Apps Script Version</title>
+        <style>
+            /* CSS Integrado - Basado en la versión original */
+            body {
+                font-family: 'Roboto', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #1c1e21;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .container {
+                background-color: #ffffff;
+                padding: 2rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 500px;
+                box-sizing: border-box;
+                text-align: center;
+                margin: 1rem;
+                backdrop-filter: blur(10px);
+            }
+
+            h1 {
+                font-size: 2rem;
+                color: #667eea;
+                margin-bottom: 0.5rem;
+            }
+
+            .version-badge {
+                background: linear-gradient(45deg, #4285f4, #34a853);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                margin-bottom: 1rem;
+                display: inline-block;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                color: #333;
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+
+            p {
+                font-size: 1rem;
+                color: #606770;
+                line-height: 1.5;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            /* Botones */
+            .btn {
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 500;
+                padding: 0.75rem 1.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin: 0.5rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-primary {
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-secondary {
+                background: linear-gradient(45deg, #42a5f5, #1e88e5);
+                color: white;
+                margin-top: 1rem;
+            }
+
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(66, 165, 245, 0.4);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+            .button-group {
+                margin-top: 1.5rem;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Formularios */
+            input[type="text"] {
+                width: 100%;
+                max-width: 200px;
+                padding: 0.75rem;
+                border: 2px solid #e1e5e9;
+                border-radius: 8px;
+                font-size: 1.5rem;
+                text-align: center;
+                letter-spacing: 0.5rem;
+                margin: 1rem auto;
+                display: block;
+                transition: border-color 0.3s ease;
+            }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            textarea {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 0.75rem;
+                border: 2px solid #e1e5e9;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-family: 'Roboto', sans-serif;
+                resize: vertical;
+                margin-bottom: 1rem;
+                transition: border-color 0.3s ease;
+            }
+
+            textarea:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            /* Código de sesión */
+            #session-code-container {
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                color: white;
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+            }
+
+            #session-code {
+                font-size: 2rem;
+                font-weight: bold;
+                letter-spacing: 0.5rem;
+            }
+
+            /* Área de texto recibido */
+            .text-display-container {
+                background-color: #f8f9fa;
+                border: 2px solid #e1e5e9;
+                border-radius: 8px;
+                padding: 1rem;
+                margin: 1rem 0;
+                min-height: 200px;
+            }
+
+            #output-text {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1rem;
+                line-height: 1.5;
+                color: #333;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            /* Estado de conexión */
+            .status-indicator {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 8px;
+            }
+
+            .status-connected {
+                background-color: #28a745;
+            }
+
+            .status-disconnected {
+                background-color: #dc3545;
+            }
+
+            .status-pending {
+                background-color: #ffc107;
+                animation: pulse 1s infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+
+            /* Limitaciones técnicas */
+            .tech-info {
+                background-color: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                padding: 1rem;
+                margin-top: 1rem;
+                font-size: 0.9rem;
+                text-align: left;
+            }
+
+            .tech-info h4 {
+                margin-top: 0;
+                color: #856404;
+            }
+
+            .loader {
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #667eea;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                animation: spin 1s linear infinite;
+                display: inline-block;
+                margin-right: 10px;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Vista Inicial -->
+            <div id="initial-view">
+                <h1>🎤 Dicta App</h1>
+                <div class="version-badge">Google Apps Script Version</div>
+                <p>Convierte tu voz en texto en tiempo real usando Google Sheets como backend.</p>
+                
+                <div class="tech-info">
+                    <h4>⚠️ Limitaciones Técnicas:</h4>
+                    <ul>
+                        <li><strong>Sin WebSockets:</strong> Usa polling cada 2 segundos</li>
+                        <li><strong>Latencia:</strong> ~2-3 segundos de retraso</li>
+                        <li><strong>Requiere:</strong> Google Sheet configurado</li>
+                    </ul>
+                </div>
+
+                <div class="button-group">
+                    <button id="start-btn" class="btn btn-primary">🎤 Iniciar Dictado (Celular)</button>
+                    <button id="join-btn-initial" class="btn">💻 Recibir Texto (PC)</button>
+                </div>
+            </div>
+
+            <!-- Vista Host (Celular) -->
+            <div id="host-view" class="hidden">
+                <h2>Código de Sesión:</h2>
+                <div id="session-code-container">
+                    <span id="session-code">------</span>
+                </div>
+                <p id="status">
+                    <span class="status-indicator status-pending"></span>
+                    1. Abre la app en tu PC e ingresa este código.
+                </p>
+                <textarea id="text-input" rows="10" placeholder="Usa el micrófono de tu teclado para dictar aquí..."></textarea>
+                <div class="button-group" style="flex-direction: row; justify-content: center; gap: 1rem;">
+                    <button id="send-text-btn" class="btn btn-primary">📤 Enviar</button>
+                    <button id="clear-text-btn" class="btn btn-secondary">🗑️ Borrar Texto</button>
+                </div>
+                <div class="button-group" style="flex-direction: row; justify-content: center; gap: 1rem;">
+                    <button id="check-connection-btn" class="btn btn-secondary">🔗 Verificar Conexión PC</button>
+                </div>
+            </div>
+
+            <!-- Vista Cliente (PC) -->
+            <div id="client-view" class="hidden">
+                <!-- Formulario para unirse -->
+                <div id="join-form">
+                    <h2>Recibir Texto</h2>
+                    <p>Ingresa el código de 6 dígitos que aparece en tu celular.</p>
+                    <input type="text" id="code-input" placeholder="######" maxlength="6" autocomplete="off">
+                    <button id="join-submit-btn" class="btn btn-primary">Conectar</button>
+                </div>
+
+                <!-- Área de visualización -->
+                <div id="display-area" class="hidden">
+                    <h2>
+                        <span class="status-indicator status-connected"></span>
+                        Texto Recibido
+                    </h2>
+                    <div class="text-display-container">
+                        <pre id="output-text">Esperando texto...</pre>
+                    </div>
+                    <div class="button-group" style="flex-direction: row; justify-content: center; gap: 1rem;">
+                        <button id="refresh-text-btn" class="btn btn-primary">🔄 Actualizar</button>
+                        <button id="copy-btn" class="btn">📋 Copiar Texto</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // JavaScript integrado - Adaptado para Google Apps Script
+            
+            // Variables globales
+            let sessionCode = null;
+            let isHost = false;
+            let isClient = false;
+            let pollingInterval = null;
+            let lastTimestamp = 0;
+
+            // Elementos del DOM
+            const initialView = document.getElementById('initial-view');
+            const hostView = document.getElementById('host-view');
+            const clientView = document.getElementById('client-view');
+            const joinForm = document.getElementById('join-form');
+            const displayArea = document.getElementById('display-area');
+
+            const startBtn = document.getElementById('start-btn');
+            const joinBtnInitial = document.getElementById('join-btn-initial');
+            const joinSubmitBtn = document.getElementById('join-submit-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const clearTextBtn = document.getElementById('clear-text-btn');
+            const sendTextBtn = document.getElementById('send-text-btn');
+            const refreshTextBtn = document.getElementById('refresh-text-btn');
+            const checkConnectionBtn = document.getElementById('check-connection-btn');
+
+            const codeInput = document.getElementById('code-input');
+            const sessionCodeSpan = document.getElementById('session-code');
+            const textInput = document.getElementById('text-input');
+            const outputText = document.getElementById('output-text');
+            const statusP = document.getElementById('status');
+
+            // Event Listeners
+            startBtn.addEventListener('click', startSession);
+            joinBtnInitial.addEventListener('click', showJoinForm);
+            joinSubmitBtn.addEventListener('click', joinSession);
+            clearTextBtn.addEventListener('click', clearText);
+            copyBtn.addEventListener('click', copyText);
+            sendTextBtn.addEventListener('click', sendText);
+            refreshTextBtn.addEventListener('click', refreshText);
+            checkConnectionBtn.addEventListener('click', checkConnection);
+            // Removido: textInput.addEventListener('input', updateText); // Control manual ahora
+
+            // Funciones principales
+            async function startSession() {
+                try {
+                    showLoader(startBtn);
+                    
+                    const result = await google.script.run
+                        .withSuccessHandler(handleSessionCreated)
+                        .withFailureHandler(handleError)
+                        .createSession();
+                        
+                } catch (error) {
+                    handleError(error);
+                }
+            }
+
+            function handleSessionCreated(result) {
+                if (result.success) {
+                    sessionCode = result.code;
+                    isHost = true;
+                    
+                    sessionCodeSpan.innerText = sessionCode;
+                    initialView.classList.add('hidden');
+                    hostView.classList.remove('hidden');
+                    
+                    // Comentado: Ahora control manual con botón 'Enviar'
+                    // startPolling();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+                hideLoader(startBtn);
+            }
+
+            function showJoinForm() {
+                initialView.classList.add('hidden');
+                clientView.classList.remove('hidden');
+                joinForm.classList.remove('hidden');
+                displayArea.classList.add('hidden');
+            }
+
+            async function joinSession() {
+                const code = codeInput.value.trim();
+                
+                if (code.length !== 6) {
+                    alert('El código debe tener 6 dígitos.');
+                    return;
+                }
+
+                try {
+                    showLoader(joinSubmitBtn);
+                    
+                    const result = await google.script.run
+                        .withSuccessHandler(handleJoinSuccess)
+                        .withFailureHandler(handleError)
+                        .joinSession(code);
+                        
+                } catch (error) {
+                    handleError(error);
+                }
+            }
+
+            function handleJoinSuccess(result) {
+                if (result.success) {
+                    sessionCode = codeInput.value.trim();
+                    isClient = true;
+                    
+                    joinForm.classList.add('hidden');
+                    displayArea.classList.remove('hidden');
+                    
+                    // Mostrar texto actual si existe
+                    if (result.currentText) {
+                        outputText.innerText = result.currentText;
+                    }
+                    
+                    // Comentado: Ahora control manual con botón 'Actualizar'
+                    // startPolling();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+                hideLoader(joinSubmitBtn);
+            }
+
+            async function updateText() {
+                if (!sessionCode || !isHost) return;
+
+                try {
+                    await google.script.run
+                        .withFailureHandler(console.error)
+                        .updateText(sessionCode, textInput.value);
+                } catch (error) {
+                    console.error('Error updating text:', error);
+                }
+            }
+
+            // Nueva función: Enviar texto manualmente (para el host/celular)
+            async function sendText() {
+                if (!sessionCode || !isHost) return;
+
+                try {
+                    showLoader(sendTextBtn);
+                    
+                    await google.script.run
+                        .withSuccessHandler(() => {
+                            // Mostrar feedback visual
+                            sendTextBtn.innerText = '✅ ¡Enviado!';
+                            setTimeout(() => {
+                                sendTextBtn.innerText = '📤 Enviar';
+                            }, 2000);
+                        })
+                        .withFailureHandler((error) => {
+                            console.error('Error sending text:', error);
+                            alert('Error al enviar texto: ' + error);
+                        })
+                        .updateText(sessionCode, textInput.value);
+                        
+                } catch (error) {
+                    console.error('Error sending text:', error);
+                    alert('Error al enviar texto');
+                } finally {
+                    hideLoader(sendTextBtn);
+                }
+            }
+
+            // Nueva función: Actualizar texto manualmente (para el client/PC)
+            async function refreshText() {
+                if (!sessionCode || !isClient) return;
+
+                try {
+                    showLoader(refreshTextBtn);
+                    
+                    const result = await google.script.run
+                        .withSuccessHandler((result) => {
+                            if (result && result.success) {
+                                const previousText = outputText.innerText;
+                                const newText = result.text || 'Esperando texto...';
+                                outputText.innerText = newText;
+                                lastTimestamp = result.timestamp;
+                                
+                                // Mostrar feedback visual mejorado
+                                if (previousText !== newText && result.text) {
+                                    refreshTextBtn.innerText = '✨ ¡Texto Nuevo!';
+                                } else if (result.text) {
+                                    refreshTextBtn.innerText = '✅ Sin cambios';
+                                } else {
+                                    refreshTextBtn.innerText = '⏳ Esperando texto...';
+                                }
+                                
+                                // Mostrar estado de conexión del host
+                                if (!result.hostConnected) {
+                                    refreshTextBtn.innerText = '📱 Celular desconectado';
+                                }
+                                
+                                setTimeout(() => {
+                                    refreshTextBtn.innerText = '🔄 Actualizar';
+                                }, 3000);
+                            } else {
+                                alert('Error: ' + (result?.error || 'No se pudo obtener el texto'));
+                            }
+                            hideLoader(refreshTextBtn);
+                        })
+                        .withFailureHandler((error) => {
+                            console.error('Error refreshing text:', error);
+                            alert('Error al actualizar texto: ' + error);
+                            hideLoader(refreshTextBtn);
+                        })
+                        .getText(sessionCode);
+                    
+                } catch (error) {
+                    console.error('Error refreshing text:', error);
+                    alert('Error al actualizar texto');
+                    hideLoader(refreshTextBtn);
+                }
+            }
+
+            async function clearText() {
+                if (!sessionCode || !isHost) return;
+
+                if (confirm('¿Estás seguro de que quieres borrar todo el texto?')) {
+                    try {
+                        textInput.value = '';
+                        await google.script.run
+                            .withFailureHandler(console.error)
+                            .clearText(sessionCode);
+                    } catch (error) {
+                        console.error('Error clearing text:', error);
+                    }
+                }
+            }
+
+            function copyText() {
+                navigator.clipboard.writeText(outputText.innerText)
+                    .then(() => {
+                        copyBtn.innerText = '✅ ¡Copiado!';
+                        setTimeout(() => {
+                            copyBtn.innerText = '📋 Copiar Texto';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        alert('Error al copiar el texto.');
+                        console.error('Error copying:', err);
+                    });
+            }
+
+            // Nueva función: Verificar conexión del PC
+            async function checkConnection() {
+                if (!sessionCode || !isHost) return;
+
+                try {
+                    showLoader(checkConnectionBtn);
+                    
+                    const result = await google.script.run
+                        .withSuccessHandler((result) => {
+                            if (result && result.success) {
+                                if (result.clientConnected) {
+                                    updateStatus('✅ ¡PC Conectado! Ya puedes enviar texto.', 'connected');
+                                    checkConnectionBtn.innerText = '✅ PC Conectado';
+                                } else {
+                                    updateStatus('⏳ PC no conectado. Comparte el código.', 'pending');
+                                    checkConnectionBtn.innerText = '❌ PC Desconectado';
+                                }
+                                
+                                // Restaurar texto del botón después de 3 segundos
+                                setTimeout(() => {
+                                    checkConnectionBtn.innerText = '🔗 Verificar Conexión PC';
+                                }, 3000);
+                            } else {
+                                alert('Error: ' + (result?.error || 'No se pudo verificar conexión'));
+                            }
+                            hideLoader(checkConnectionBtn);
+                        })
+                        .withFailureHandler((error) => {
+                            console.error('Error checking connection:', error);
+                            alert('Error al verificar conexión: ' + error);
+                            hideLoader(checkConnectionBtn);
+                        })
+                        .getText(sessionCode);
+                        
+                } catch (error) {
+                    console.error('Error checking connection:', error);
+                    alert('Error al verificar conexión');
+                    hideLoader(checkConnectionBtn);
+                }
+            }
+
+            // Polling para simular tiempo real
+            function startPolling() {
+                pollingInterval = setInterval(async () => {
+                    if (!sessionCode) {
+                        stopPolling();
+                        return;
+                    }
+
+                    try {
+                        const result = await google.script.run
+                            .withFailureHandler(console.error)
+                            .getText(sessionCode);
+
+                        if (result.success) {
+                            // Actualizar estado de conexión
+                            if (isHost && result.clientConnected) {
+                                updateStatus('✅ ¡Conectado! Ya puedes empezar a dictar.', 'connected');
+                            }
+
+                            // Actualizar texto si es cliente y hay cambios
+                            if (isClient && result.timestamp > lastTimestamp) {
+                                outputText.innerText = result.text || 'Esperando texto...';
+                                lastTimestamp = result.timestamp;
+                            }
+
+                            // Verificar desconexión
+                            if (isHost && !result.clientConnected && lastTimestamp > 0) {
+                                updateStatus('⏳ Esperando conexión del PC...', 'pending');
+                            }
+
+                        } else {
+                            // Sesión no existe, posible desconexión
+                            handleSessionEnded();
+                        }
+                    } catch (error) {
+                        console.error('Polling error:', error);
+                    }
+                }, 2000); // Polling cada 2 segundos
+            }
+
+            function stopPolling() {
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+            }
+
+            function updateStatus(message, status) {
+                statusP.innerHTML = `<span class="status-indicator status-${status}"></span>${message}`;
+            }
+
+            function handleSessionEnded() {
+                alert('La sesión ha terminado o ha expirado.');
+                stopPolling();
+                window.location.reload();
+            }
+
+            function handleError(error) {
+                console.error('Error:', error);
+                alert('Error: ' + (error.message || error.toString()));
+                hideAllLoaders();
+            }
+
+            // Utilidades de UI
+            function showLoader(button) {
+                const loader = document.createElement('div');
+                loader.className = 'loader';
+                loader.id = 'loader-' + button.id;
+                
+                button.style.position = 'relative';
+                button.insertBefore(loader, button.firstChild);
+                button.disabled = true;
+            }
+
+            function hideLoader(button) {
+                const loader = document.getElementById('loader-' + button.id);
+                if (loader) {
+                    loader.remove();
+                }
+                button.disabled = false;
+            }
+
+            function hideAllLoaders() {
+                document.querySelectorAll('.loader').forEach(loader => loader.remove());
+                document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+            }
+
+            // Cleanup al cerrar la página
+            window.addEventListener('beforeunload', () => {
+                if (sessionCode) {
+                    const role = isHost ? 'host' : 'client';
+                    google.script.run.disconnect(sessionCode, role);
+                }
+            });
+
+            // Inicialización
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('Dicta App - Google Apps Script Version cargada');
+            });
+        </script>
+    </body>
+    </html>

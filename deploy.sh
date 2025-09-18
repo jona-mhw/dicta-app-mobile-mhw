@@ -16,7 +16,7 @@ gcloud run deploy dictapp-mhw \
   --allow-unauthenticated \
   --platform managed \
   --memory 512Mi \
-  --cpu 1 \
+  --cpu 1 \7
   --concurrency 80 \
   --max-instances 10 \
   --min-instances 0 \
